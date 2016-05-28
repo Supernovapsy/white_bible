@@ -1,1 +1,0 @@
-A C program, regardless of its size, consists of functions and variables.

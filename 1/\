@@ -1,0 +1,28 @@
+#include <stdio.h>
+#define TABSTOP 2
+
+/* print each incoming character, or each TABSTOP consecutive blanks as a tab.
+ */
+
+int main()
+{
+    int c, count = 0;
+
+    while ((c = getchar()) != EOF)
+    {
+        if (c == ' ')
+        {
+            if (++count == TABSTOP)
+                putchar('\t');
+                count = 0;
+        }
+        else
+        {
+            for (; count != 0; --count)
+                putchar(' ');
+            putchar(c);
+        }
+    }
+
+    return 0;
+}
