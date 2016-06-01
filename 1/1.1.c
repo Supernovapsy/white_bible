@@ -1,3 +1,5 @@
+// Hello world.
+
 // Links functions defined in the standard input/output library, which is
 // defined in the ANSI standard.
 #include <stdio.h>

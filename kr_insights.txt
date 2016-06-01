@@ -1,8 +1,416 @@
-A C program, regardless of its size, consists of functions and variables.
+1
+- *A C program, regardless of its size, consists of functions and variables.*
+- *C programs generally consist of many small functions rather than a few big
+  ones.*
+- A variable consists of letters and numbers beginning with a letter. '_'
+  counts as a letter.
+    * Do not begin variables with _, as library routines often use such names.
+    * Traditional C practice is to use lower case for variable names, and all
+      upper case for symbolic constants.
+- The choice between for and while is arbitrary, based on which seems clearer.
+- symbolic constants: #define NAME replacement_text
+    * name - same format as a variable
+    * replacement_text - any sequence of characters
+- <stdio.h>: printf, getchar, putchar
+    * These functions can be interleaved.
+- <stdio.h>: (int) EOF
+    * cannot be confused with any char value.
+- Continuing to read from a file having already reached EOF will continue to
+  return EOF if getchar() is called.
+- ; is a null statement.
+- the standard library ensures that an input text stream appears as a sequence
+  of lines, each terminated by a newline. Hence, counting lines is just
+  counting newlines.
+- With properly designed functions, it is possible to ignore how a job is done,
+  knowing what is done is sufficient.
+- A function prototype's parameter names need not agree with the names in the
+  definition. These names can serve as documentation.
+- external variables are globally accessible.
+    * An external variable must be defined, exactly once, outside of any function;
+      this sets aside storage for it. The variable must also be declared in each
+      function that wants to access it; this states the type of the variable.
+    * If the definition of an external variable occurs in the source file
+      before its use in a particular function, then there is no need for an
+      extern declaration in the function.
+    * If the program is in several source files, and a variable is defined in
+      file1 and used in file2 and file3, then extern declarations are needed in
+      file2 and file3 to connect the occurrences of the variable.
+    * The usual practice is to collect extern declarations of variables and
+      functions in a separate file, historically called a header, that is
+      included by #include at the front of each source file. The suffix .h is
+      conventional for header names.
+- f(void) is the correct way to declare function prototypes taking no
+  arguments. f() turns off all argument list checking.
+- *Reasons why not to curb the use of global variables:*
+    * Data connections are not obvious => programs are hard to modify.
+    * Functions wired to external variable names => functions don't have generality.
+- *the arithmetic value of a logical expression, is either zero (false) or one
+  (true).
+- *C does not support function overloading.*
+- Declarations in C guarantee that the declarations are made in order, such
+  that the following is legal:
+  * struct rect r, *rp = &r;
 
-... missed some stuff
+2
+- At least the first 31 characters of an internal name are significant. For
+  function names and external variables, the number may be less than 31,
+  because external names may be used by assemblers and loaders over which the
+  language has no control. For external names, the standard guarantees
+  uniqueness only for 6 characters and a single case.
+- We tend to use short names for local variables, especially loop indices, and
+  longer names for external variables.
+- Basic types in C: <char, int, float, double>. There are a number of
+  qualifiers that can be applied to them.
+    * short and long apply to integers. "int" can be omitted in declarations.
+    * signed or unsigned may be applied to char or any integer.
+    * The type long double specifies extended-precision floating point.
+    * sizeof(short) <= sizeof(int) <= sizeof(long)
+    * sizeof(float) <= sizeof(double) <= sizeof(long double)
+    * The standard headers <limits. h> and <float. h> contain symbolic
+      constants for all of these sizes, along with other properties of the
+      machine and compiler.
+- Creating these basic types.
+    * A long constant is written with a terminal l/L, an integer too big to fit
+      into an int will also be taken as a long. Unsigned constants are written
+      with a terminal u or U,and the suffix ul or UL indicates unsigned long.
+    * Floating-point constants contain a decimal point (123. 4) or an exponent
+      (1e-2) or both; their type is double, unless suffixed. The suffixes f or
+      F indi- cate a float constant; 1or Lindicate a long double.
+    * A leading 0 (zero) on an integer constant means octal; a leading Ox or ox
+      means hexadecimal.
+    * The value of a character constant is the numeric value of the character
+      in the machine's character set.
+    * '\ooo' or '\xhh' can represent arbitrary byte-sized bit patterns
+      specified in octal or hexadecimal format.
+- strings and enumeration constants are the other constant types in C.
+- Enumerations are lists of constant integer values.
+    * enum BOOLEAN { NO, YES };
+    * enums implicitly start with 0 and increments. Can manually specify
+      integer value of any enum name, and all other names will follow with
+      consecutive values.
+    * Names in different enumerations must be distinct. Values need not be
+      distinct in the same enumeration.
+    * enumeration variables offer the chance of checking that the value stored
+      is valid and so are often better than #defines in associating constant
+      values with names.
+- *External and static variables are initialized to zero by default; Automatic
+  variables for which there is no explicit initializer have undefined (i.e.,
+  garbage) values.*
+- The qualifier const can be applied to the declaration of any variable to
+  specify that its value will not be changed. For an array, the const qualifier
+  says that the elements will not be altered
+  * int strlen(const char[]); // The function will not change the array.
+  * The result is implementation-defined if an attempt is made to change a
+    const.
+- When an operator has operands of different types, they are converted to a
+  common type according to a small number of rules. In general, the only
+  automatic conversions are those that convert a "narrower" operand into a
+  "wider" one without losing information. Expressions that might lose infor-
+  mation, like assigning a longer integer type to a shorter, or a
+  floating-point type to an integer, may draw a warning, but they are not
+  illegal.
+- When a char is converted to an int, can it ever produce a negative integer?
+  The answer varies from machine to machine depending on architecture.
+  * C guarantees no character in the machine's standard character set will be
+    negative, but arbitrary bit patterns may cause them to appear negative on
+    some machines while positive on others.
+  * Specified signed or unsigned if non-character data is to be stored in char
+    variables.
+- In general, mathematical functions like those in <math. h> will use double
+  precision
+- The main reason for using float is to save storage in large arrays, or, less
+  often, to save time on machines where double-precisionarithmetic is
+  particularly expensive.
+- float to int causes truncation of any fractional part.
+- explicit type conversions can be forced ("coerced") in any expression, with a
+  unary operator called a cast.
+  * (typename) expression
+  * Since function take in expressions as arguments, arguments are also
+    implicitly cast before the execution of the function body.
+- There are 5 arithmetic operators and 5 bitwise operators. They can use the
+  shorthand (op)= syntax for evaluating assignment expressions.
+  * + - * / %, & | ^ << >>
+- exp1 op= exp2 <=> exp1 = exp1 op exp2. exp1 is only evaluated once.
+- the precedenceof the bitwise operators &, | and ^ falls below == and !=.
+- *The moral is that writing code that depends on order of evaluation is a bad
+  programming practice in any language.*
+- C, like most languages, does not specify the order in which the operands of
+  an operator are evaluated. (The exceptions are &&, ||, ?:, and ','.)
+  * x = f() + g(); If f or g alters x on which the other depends, x might
+    depend on the order of evaluation, which is implementation-specific.
+- The order in which function arguments are evaluated is also not specified.
+  * printf("%d %d\n", ++n, power(2, n)); // WRONG.
+- The order in which side-effects and expressions are evaluated is also
+  unspecified.
+  * a[i] = i++; // Implementation specific.
+  * The standard only specifies that argument expressions' side effects take
+    place before functions are called.
 
-With properly designed functions, it is possible to ignore how a job is done,
-knowing what is done is sufficient.
+<string.h>
+- strlen(s): returns length of string.
+- strcat(s, t): concatenate t to the end of s; s must be big enough.
+- strpbrk(s1, s2): returns a pointer to location of s1 that contains s2. -1 if
+  not found.
+- strstr(s, t): if s contains t, returns pointer to char in s at beginning of
+  substring.
 
-f(void) is the correct way to declare function prototypes taking no arguments.
+<ctype.h> defines a family of functions that provide tests and conversionsthat
+are independent of character set.
+- isdigit(c)
+- tolower(c)
+- isspace(c)
+
+<math.h>
+- pow(n, m)
+- sqrt(n)
+
+<stdlib.h>
+- atoi(s): converts a string of digits into its numeric equivalent
+- itoa(n)
+- atof(s): converts a string of a decimal number into a floating-point number.
+- strtol(s): converts strings to long integers.
+- htoi(s): hex to integer.
+- abs(n)
+- malloc(size_t)
+
+- The standard library includes a function ungetc that provides one character
+  of push back.
+
+3
+- An expression becomes a statement when it is terminated by ;. ; is the
+  statement terminator in C.
+- {} groups declarations and statements together into a compound statement or
+  block. Variables can be declared in any block.
+- *else statements associate with the closest previous else-less if in the same
+  block.
+- The switch statement provides another way to write a multi-way branch that is
+  particularly suitable when the condition is whether some integer or character
+  expression matches one of a set of constants.
+- Because cases serve just as labels, after the code for one case is done,
+  execution falls through to the next unless you take explicit action to escape.
+- With the exception of multiple labels for a single computation, fall-throughs
+  should be used sparingly, and commented.
+- *A pair of expressions separated by a comma is evaluated left to right, and the
+  type and value of the result are the type and value of the right operand.*
+- The commas that separate function arguments, variables in declarations, etc.,
+  are not comma operators, and do not guarantee left to right evaluation.
+- *in the for, control passes to the increment step when "continue" is
+  executed.*
+
+4: Functions
+- Minimum function: dummy() {}
+- int is assumed if return type is omitted.
+- The expression of return will be converted to the return type of the function
+  if necessary.
+- If a name that has not been previously declared occurs in an expression and
+  is followed by a left parenthesis, it is declared by context to be a function
+  name, the function is assumed to return an int, and nothing is assumed about
+  its arguments.
+- double atof(); <- same as above.
+- *generalizing the role of functions is a habit in the white bible.*
+  * When functions are generalized, they can be used just like any other
+    operation, simplifying the thinking process of the programmer.
+- *In the book, define directives are used to generalize the functions used.*
+- *The scope of a name is the part of the program within which the name can be
+  used.*
+- *The scope of an external variable or a function lasts from the point at
+  which it is declared to the end of the file being compiled.*
+- *A declaration announces the properties of a variable (primarily its type);
+  a definition also causes storage to be set aside*
+- There must be only one definition of an external variable among all the files
+  that make up the source program.
+- Initialization of an external variable goes only with the definition.
+- There is a tradeoff between the desire that each file have access only to the
+  information it needs for its job and the practical reality that it is harder
+  to maintain more header files.
+- *The static declaration, applied to an external variable or function, limits
+  the scope of that object to the rest of the source file being compiled.*
+  * Static ~= static to the source file of definition.
+- *Internal static variables are local to a particular function, but remain in
+  existence across function calls.
+- A register declaration advises the compiler that the variable in question
+  will be heavily used. The idea is that register variables are to be placed in
+  machine registers, which may result in smaller and faster programs. But com-
+  pilers are free to ignore the advice.
+- As a matter of style, it's best to avoid variable names that conceal names in
+  an outer scope; the potential for confusion and error is too great.
+- *In the absence of explicit initialization, external and static variables are
+  guaranteed to be initialized to zero; automatic and register variables have
+  undefined (i.e., garbage) initial values.*
+- *For external and static variables, the initializer must be a constant
+  expression; the initialization is done once, conceptually before the program
+  begins execution.*
+- In effect, initializations of automatic variables are just shorthand for
+  assignment statements.
+  * We have gen- erally used explicit assignments, because initializers in
+    declarations are harder to see and further away from the point of use.
+- *If there are fewer initializers for an array than the number specified, the
+  missing elements will be zero for external, static, and automatic variables.
+  It is an error to have too many initializers.*
+- For a macro substitution (#define), Normally the replacement text is the rest
+  of the line, but a long defini- tion may be continued onto several lines by
+  placing a \ at the end of each line to be continued.
+  * A definition may use previous definitions.
+  * Substitutions are made only for tokens, and do not take place within quoted
+    strings. For example, if YES is a defined name, there would be no
+    substitution in printf("YES") or in YESMAN.
+  * It is also possible to define macros with arguments.
+  * #define max(A, B) (A) > (B) ? (A) : (B)
+  * Names may be undefined with #undef.
+  * Formal parameters are not replaced within quoted strings. If, however, a
+    parameter name is preceded by a # in the replacement text, the combination
+    will be expanded into a quoted string with the parameter replaced by the
+    actual argument.
+// In C++ HDR can be any string, as long as it is unique for each header.
+#if !defined(HDR)
+#define HDR
+/* contents of hdr.h go here */
+#endif
+
+5. Pointers and arrays
+- a pointer is constrained to point to a particular kind of object, except
+  the void pointer, which is a generic pointer that cannot be dereferenced.
+- unary operators like * and ++ associate from right to left.
+- The meaning of "adding 1 to a pointer," and by extension, all pointer
+  arithmetic, is that pa+ 1 points to the next object.
+- *By definition, the value of a variable or expression of type array is the
+  address of element zero of the array.*
+- In evaluating a[i], C converts it to * (a+i) immediately; the two forms are
+  equivalent.
+- *A pointer is a variable and can be manipulated; however, an array is not,
+  and cannot be manipulated.*
+- *When an array name is passed to a function, what is passed is the location
+  of the initial element. Thus, array parameters for functions are in fact
+  local variables - i.e. pointers.*
+  * foo(int bar[]) <=> foo(int* bar)
+- C is consistent and regular in its approach to address arithmetic; its
+  integration of pointers, arrays, and address arithmetic is one of the
+  strengths of the language.
+- *C guarantees that zero is never a valid address for data.
+  * so a return value of zero can be used to signal an abnormal event.
+- *Pointers and integers are not interchangeable. Zero is the sole exception:
+  the constant zero may be assigned to a pointer, and a pointer may be compared
+  with the constant zero. The symbolic constant NULL is often used in place of
+  zero, as a mnemonic to indicate more clearly that this is a special value for
+  a pointer. NULL is defined in <stdio.h>. We will use NULL henceforth.
+- *pointer comparison is only defined for comparison between 0 and object
+  addresses of the same array, from the first element to the first element past
+  the last element in the array.
+- The header <stddef.h> defines a type ptrdiff_t that is large enough to hold
+  the signed difference of two pointer values.
+- size_t is the unsigned integer type returned by the sizeof operator, which is
+  able to hold the size of any object in a C program.
+- *The valid pointer operations are assignment of pointers of the same type,
+  adding or subtracting a pointer and an integer, subtracting or comparing two
+  pointers to members of the same array, and assigning or comparing to zero.
+  All other pointer arithmetic is illegal.*
+- *the addition of two pointers is illegal.*
+- *C does not provide any operators for process- ing an entire string of
+  characters as a unit.*
+- *double quotes enclose character constants. Modifying them through a pointer
+  is undefined behaviour.*
+- C provides rectangular multi-dimensional arrays, although in practice they
+  are much less used than arrays of pointers.
+- *If a two-dimensional array is to be passed to a function, the parameter
+  declaration in the function must include the number of column*
+- int *array[13] is an array of 13 pointers to ints.
+- int (*array)[13] is a pointer to 13-element integer arrays.
+- *In the <type> <name> declaration, read name as if you're using it.*
+- *The important advantage of the pointer array is that the rows of the array
+  may be of different lengths*
+- *the standard requires that argv[argc] be a null pointer*
+- *Referring to a function by its name only refers to its address*
+- *Whether a variable or function in C, they have two components: name and
+  type, and these are the two components to any variable or function
+  declaration*
+- ^To a computer, everything is to be referred to as memory, but to a human,
+  everything is referred to by its function. This is why the default behaviour
+  of referring to a fcn(), variable, or arr[] refers to their functions: fcn()
+  calls a procedure, variable is a value to be manipulated, and arr[] can be
+  subscripted for its values. To the computer, their address is how they're
+  referred: fcn by its address, *variable by its address, and arr by its
+  address.
+- *To understand complex variable/function declarations, all one has to
+  remember is the right-associativity of unary operators ((), [], *).*
+- *the size of the array is completely determined at compile time. This is why
+  the sizeof/sizeof() operator works on arrays. As a label to a piece of
+  storage which cannot be modified, it can provide that information accurately
+  anywhere it is accessible*
+- size_t is an unsigned integer type defined in <stddef.h>
+
+6: structures
+- A structure is a collection of one or more variables, possibly of different
+  types, grouped together under a single name for convenient handling.
+- An optional tag following the struct keyword names the struct, and is a
+  shorthand for the part in {} for future definitions of structure variables.
+- A struct declaration including the {} brackets defines a type
+- Initialization of a struct variable: struct point maxpt = { 320, 200 };
+- Structures can be nested, and can be declared as automatic variables.
+- *A declaration of a structure with a label "point" has to follow the format*
+  struct point p;
+  point here substitutes for the {} part in the original definition.
+- *The only legal operations on a structure are copying it or assigning to it
+  as a unit, taking its address with &, and accessing its members*
+- The structure operators. and ->, together with () for function calls and []
+  for subscripts, are at the top of the precedence hierarchy and thus bind very
+  tightly.
+- *#if and #include are evaluated by the preprocessor, but the expression in
+  #define NAME expr is not, meaning that it can be an expression with
+  variables, arrays, and operators.*
+- *Don't assume, however, that the size of a structure is the sum of the sizes
+  of its members. Because of alignment requirements for different objects,
+  there may be unnamed "holes" in a structure. sizeof returns the correct
+  value.*
+- It is illegal for a structure to contain itself - for an obvious reason.
+- *However, it is legal for a structure to contain a pointer to its own
+  structure type.*
+- The question of the type declaration for a function like malloe is a vexing
+  one for any language that takes its type-checking seriously.
+- *In C, the proper method is to declare that malloe returns a pointer to void,
+  then explicitly coerce the pointer into the desired type with a cast*
+- *For example, the declaration
+    typedef int Length;
+  makes the name Length a synonym for int. The type Length can be used in
+  declarations, casts, etc., in exactly the same ways that the type int can be*
+- *In effect, typedef is like #define, except that since it is interpreted by
+  the compiler, it can cope with textual substitutions that are beyond the
+  capabilities of the preprocessor.*
+  * typedef int (*PFI)(char *, char *);
+    Here, PFI is a pointer to a function returning int.
+- *There are two main reasons for using typedefs.
+  1. To parameterize a program against portability
+  problems. If typedefs are used for data types that may be machine-dependent,
+  only the typedefs need change when the program is moved. One common situation
+  is to' use tyPedef names for various integer quantities, then make an
+  appropriate set of choices of short, int, and long for each host machine.
+  Types like size_t and ptrdiff_t from the standard library are examples.
+  2. To provide better documentation for a program-a type called Treeptr may be
+  easier to understand than one declared only as a pointer to a complicated
+  structure.*
+- *A union is a variable able to hold variables of different types and sizes in the same storage
+  space. As an example use, a generic hash table doesn't want to worry about the type
+  of the data that it is storing, but variables stored in it must be of the
+  correct type at declaration of the hash table. Unions provide a way for hash
+  tables to store different variable types knowing that they each take the same
+  storage space and are located in the same locations, no matter which type is
+  stored in a particular node.*
+- *Usage of a union must be consistent - The last type stored must be the same
+  type that is retrieved. It is up to the programmer to ensure that the usage
+  is consistent. Inconsistent behaviour is undefined and implementation
+  specific.*
+- *The syntax for unions is the same as a structure.*
+- *In effect, a union is a structure in which all members have offset zero from
+  the base, the structure is big enough to hold the "widest" member, and the
+  alignment is appropriate for all of the types in the union.*
+- *A union may only be initialized with a value of the type of its first
+  member.*
+- *A bit-field, or field for short, is a set of adjacent bits within a single
+  implementation-defined storage unit that we will call a "word."*
+- *Almost everything about fields is implementation-dependent. Whether a field
+  may overlap a word boundary is implementation-defined. Fields need not be
+  named; unnamed fields (a colon and width only) are used for padding. The
+  special width 0 may be used to force alignment at the next word boundary.*
+- *Fields are stored according to the implementation-specific endian rules.*
+- *Fields may be declared only as ints; for portabil- ity, specify signed or
+  unsigned explicitly. They are not arrays, and they do not have addresses, so
+  the &. operator cannot be applied to them.*
